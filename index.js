@@ -25,7 +25,7 @@ const toPageUrl = (input, _fs = fs) => {
   return pathToFileURL(p).toString();
 };
 
-const renderToPng = async ({ pageUrl, pngPath, selector, width, height, scale, timeout, waitUntil }, _chromium = chromium) => {
+const renderToPng = async ({ pageUrl, pngPath, selector, width, height, scale, timeout, waitUntil, fullPage = true }, _chromium = chromium) => {
   const browser = await _chromium.launch();
   const page = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: scale });
 
@@ -38,7 +38,7 @@ const renderToPng = async ({ pageUrl, pngPath, selector, width, height, scale, t
       if ((await loc.count()) === 0) throw new Error(`Selector not found: ${selector}`);
       await loc.first().screenshot({ path: pngPath });
     } else {
-      await page.screenshot({ path: pngPath, fullPage: true });
+      await page.screenshot({ path: pngPath, fullPage });
     }
   } finally {
     await browser.close();
@@ -89,6 +89,8 @@ const main = async (_toPageUrl = toPageUrl, _renderToPng = renderToPng, _pngToPp
     .option("--scale <n>", "Device scale factor", (v) => parseInt(v, 10), 2)
     .option("--timeout <n>", "Navigation timeout in ms", (v) => parseInt(v, 10), 30000)
     .option("--wait <strategy>", "Wait strategy: load, domcontentloaded, networkidle, commit", "networkidle")
+    .option("--full-page", "Capture full page", true)
+    .option("--no-full-page", "Capture only viewport")
     .parse(process.argv);
 
   const opts = program.opts();
@@ -107,6 +109,7 @@ const main = async (_toPageUrl = toPageUrl, _renderToPng = renderToPng, _pngToPp
     scale: opts.scale,
     timeout: opts.timeout,
     waitUntil: opts.wait,
+    fullPage: opts.fullPage,
   });
 
   await _pngToPptx({ pngPath, pptxPath, widescreen: true });
