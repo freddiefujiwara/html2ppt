@@ -123,6 +123,14 @@ async function main() {
   console.log(`(intermediate) ${pngPath}`);
 }
 
+module.exports = {
+  isHttpUrl,
+  toPageUrl,
+  renderToPng,
+  pngToPptx,
+  main
+};
+
 /* v8 ignore start */
 if (require.main === module) {
   main().catch((e) => {
@@ -131,11 +139,3 @@ if (require.main === module) {
   });
 }
 /* v8 ignore stop */
-
-module.exports = {
-  isHttpUrl,
-  toPageUrl,
-  renderToPng,
-  pngToPptx,
-  main
-};
