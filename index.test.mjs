@@ -219,6 +219,28 @@ describe('html2ppt', () => {
         pngToPptxSpy.mockRestore();
         logSpy.mockRestore();
     });
+
+    it('should default to full-page screenshot when no selector is provided', async () => {
+        const originalArgv = process.argv;
+        process.argv = ['node', 'index.js', 'http://example.com', '--out', 'test.pptx'];
+
+        const toPageUrlSpy = vi.spyOn(html2ppt, 'toPageUrl').mockReturnValue('http://example.com');
+        const renderToPngSpy = vi.spyOn(html2ppt, 'renderToPng').mockResolvedValue(true);
+        const pngToPptxSpy = vi.spyOn(html2ppt, 'pngToPptx').mockResolvedValue(true);
+        const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+        await html2ppt.main(toPageUrlSpy, renderToPngSpy, pngToPptxSpy);
+
+        expect(renderToPngSpy).toHaveBeenCalledWith(expect.objectContaining({
+            selector: null
+        }));
+
+        process.argv = originalArgv;
+        toPageUrlSpy.mockRestore();
+        renderToPngSpy.mockRestore();
+        pngToPptxSpy.mockRestore();
+        logSpy.mockRestore();
+    });
   });
 
   describe('CLI', () => {

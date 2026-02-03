@@ -85,7 +85,7 @@ async function main(_toPageUrl = toPageUrl, _renderToPng = renderToPng, _pngToPp
     .argument("<input>", "HTML file path or URL (http/https)")
     .option("-o, --out <pptx>", "Output pptx path", "slide.pptx")
     .option("--png <png>", "Intermediate png path (default: out with .png)")
-    .option("--selector <css>", "CSS selector to capture (default: .slide). Use empty for full-page.", ".slide")
+    .option("--selector <css>", "CSS selector to capture. Use empty for full-page.", "")
     .option("--width <n>", "Viewport width", (v) => parseInt(v, 10), 960)
     .option("--height <n>", "Viewport height", (v) => parseInt(v, 10), 540)
     .option("--scale <n>", "Device scale factor", (v) => parseInt(v, 10), 2);

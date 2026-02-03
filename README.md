@@ -15,6 +15,8 @@ npx playwright install --with-deps chromium
 > **Tip:** If you encounter SSL errors during Playwright installation, you can try:
 > `NODE_TLS_REJECT_UNAUTHORIZED=0 npx playwright install --with-deps chromium`
 
+> **Note:** If you get an error saying Playwright is not installed even though you have installed it, please go to the `html2ppt` directory inside the `node_modules` folder where it is installed and try running `npx playwright install` there.
+
 ## Usage
 
 You can use it with a local HTML file or a URL.
@@ -34,7 +36,7 @@ html2ppt https://example.com
 ### Options
 
 - `-o, --out <pptx>`: Change output file name (default: `slide.pptx`)
-- `--selector <css>`: Pick a specific part of the page (default: `.slide`). If you want the whole page, use `--selector ""`.
+- `--selector <css>`: Pick a specific part of the page. If you want the whole page, use `--selector ""` (default: `""`).
 - `--width <n>`: Viewport width (default: `960`)
 - `--height <n>`: Viewport height (default: `540`)
 - `--scale <n>`: Resolution scale (default: `2`)
