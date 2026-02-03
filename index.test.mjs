@@ -88,8 +88,11 @@ describe('html2ppt', () => {
           width: 960,
           height: 540,
           scale: 2,
+          timeout: 10000,
+          waitUntil: 'load',
         }, mockChromium);
 
+        expect(mockPage.goto).toHaveBeenCalledWith('http://example.com', { waitUntil: 'load', timeout: 10000 });
         expect(mockPage.screenshot).toHaveBeenCalledWith({ path: 'out.png', fullPage: true });
     });
 
@@ -201,6 +204,53 @@ describe('html2ppt', () => {
     it('should handle default png path and empty selector', async () => {
         const originalArgv = process.argv;
         process.argv = ['node', 'index.js', 'http://example.com', '--out', 'test.pptx', '--selector', ' '];
+
+        const toPageUrlSpy = vi.spyOn(html2ppt, 'toPageUrl').mockReturnValue('http://example.com');
+        const renderToPngSpy = vi.spyOn(html2ppt, 'renderToPng').mockResolvedValue(true);
+        const pngToPptxSpy = vi.spyOn(html2ppt, 'pngToPptx').mockResolvedValue(true);
+        const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+        await html2ppt.main(toPageUrlSpy, renderToPngSpy, pngToPptxSpy);
+
+        expect(renderToPngSpy).toHaveBeenCalledWith(expect.objectContaining({
+            selector: null,
+            timeout: 30000,
+            waitUntil: 'networkidle'
+        }));
+
+        process.argv = originalArgv;
+        toPageUrlSpy.mockRestore();
+        renderToPngSpy.mockRestore();
+        pngToPptxSpy.mockRestore();
+        logSpy.mockRestore();
+    });
+
+    it('should pass custom timeout and wait strategy', async () => {
+        const originalArgv = process.argv;
+        process.argv = ['node', 'index.js', 'http://example.com', '--timeout', '5000', '--wait', 'load'];
+
+        const toPageUrlSpy = vi.spyOn(html2ppt, 'toPageUrl').mockReturnValue('http://example.com');
+        const renderToPngSpy = vi.spyOn(html2ppt, 'renderToPng').mockResolvedValue(true);
+        const pngToPptxSpy = vi.spyOn(html2ppt, 'pngToPptx').mockResolvedValue(true);
+        const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+        await html2ppt.main(toPageUrlSpy, renderToPngSpy, pngToPptxSpy);
+
+        expect(renderToPngSpy).toHaveBeenCalledWith(expect.objectContaining({
+            timeout: 5000,
+            waitUntil: 'load'
+        }));
+
+        process.argv = originalArgv;
+        toPageUrlSpy.mockRestore();
+        renderToPngSpy.mockRestore();
+        pngToPptxSpy.mockRestore();
+        logSpy.mockRestore();
+    });
+
+    it('should default to full-page screenshot when no selector is provided', async () => {
+        const originalArgv = process.argv;
+        process.argv = ['node', 'index.js', 'http://example.com', '--out', 'test.pptx'];
 
         const toPageUrlSpy = vi.spyOn(html2ppt, 'toPageUrl').mockReturnValue('http://example.com');
         const renderToPngSpy = vi.spyOn(html2ppt, 'renderToPng').mockResolvedValue(true);
