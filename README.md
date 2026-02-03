@@ -8,6 +8,8 @@ This tool uses [Playwright](https://playwright.dev/) to take a screenshot of you
 
 ```bash
 npm i -g html2ppt
+# Install Playwright browser
+npx playwright install --with-deps chromium
 ```
 
 ## Usage
