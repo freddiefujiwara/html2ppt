@@ -152,6 +152,33 @@ describe('html2ppt', () => {
         expect(mockPage.screenshot).toHaveBeenCalledWith({ path: 'out.png', fullPage: true });
     });
 
+    it('should take viewport screenshot if fullPage is false', async () => {
+        const mockPage = {
+          goto: vi.fn().mockResolvedValue(true),
+          waitForTimeout: vi.fn().mockResolvedValue(true),
+          screenshot: vi.fn().mockResolvedValue(true),
+        };
+        const mockBrowser = {
+          newPage: vi.fn().mockResolvedValue(mockPage),
+          close: vi.fn().mockResolvedValue(true),
+        };
+        const mockChromium = {
+          launch: vi.fn().mockResolvedValue(mockBrowser),
+        };
+
+        await html2ppt.renderToPng({
+          pageUrl: 'http://example.com',
+          pngPath: 'out.png',
+          selector: null,
+          width: 960,
+          height: 540,
+          scale: 2,
+          fullPage: false,
+        }, mockChromium);
+
+        expect(mockPage.screenshot).toHaveBeenCalledWith({ path: 'out.png', fullPage: false });
+    });
+
     it('should throw error if selector is not found', async () => {
         const mockPage = {
           goto: vi.fn().mockResolvedValue(true),
@@ -316,7 +343,30 @@ describe('html2ppt', () => {
         await html2ppt.main(toPageUrlSpy, renderToPngSpy, pngToPptxSpy);
 
         expect(renderToPngSpy).toHaveBeenCalledWith(expect.objectContaining({
-            selector: null
+            selector: null,
+            fullPage: true
+        }));
+
+        process.argv = originalArgv;
+        toPageUrlSpy.mockRestore();
+        renderToPngSpy.mockRestore();
+        pngToPptxSpy.mockRestore();
+        logSpy.mockRestore();
+    });
+
+    it('should pass fullPage: false when --no-full-page is used', async () => {
+        const originalArgv = process.argv;
+        process.argv = ['node', 'index.js', 'http://example.com', '--no-full-page'];
+
+        const toPageUrlSpy = vi.spyOn(html2ppt, 'toPageUrl').mockReturnValue('http://example.com');
+        const renderToPngSpy = vi.spyOn(html2ppt, 'renderToPng').mockResolvedValue(true);
+        const pngToPptxSpy = vi.spyOn(html2ppt, 'pngToPptx').mockResolvedValue(true);
+        const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+        await html2ppt.main(toPageUrlSpy, renderToPngSpy, pngToPptxSpy);
+
+        expect(renderToPngSpy).toHaveBeenCalledWith(expect.objectContaining({
+            fullPage: false
         }));
 
         process.argv = originalArgv;
