@@ -12,6 +12,9 @@ npm i -g html2ppt
 npx playwright install --with-deps chromium
 ```
 
+> **Tip:** If you encounter SSL errors during Playwright installation, you can try:
+> `NODE_TLS_REJECT_UNAUTHORIZED=0 npx playwright install --with-deps chromium`
+
 ## Usage
 
 You can use it with a local HTML file or a URL.
